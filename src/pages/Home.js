@@ -16,6 +16,4 @@ class Home extends Component {
   }
 }
 
-  //nao sei
-
 export default Home;
