@@ -27,6 +27,15 @@ class Home extends Component {
     this.setState({ pesquisado: results, pesquisadoVazio: false });
   };
 
+  pesquisaItemsPorCategoria = async ({ target }) => {
+    const nomeCategoria = target.id;
+    const ENDPOINT = `https://api.mercadolibre.com/sites/MLB/search?q=${nomeCategoria}`;
+    const response = await fetch(ENDPOINT);
+    const items = await response.json();
+    const { results } = items;
+    this.setState({ pesquisado: results, pesquisadoVazio: false });
+  }
+
   verificaCampoPesquisa = () => {
     const { pesquisadoVazio, pesquisado } = this.state;
     if (pesquisadoVazio) {
@@ -61,6 +70,8 @@ class Home extends Component {
         type="button"
         key={ categorie.id }
         data-testid="category"
+        id={ categorie.name }
+        onClick={ this.pesquisaItemsPorCategoria }
       >
         { categorie.name }
       </button>));
