@@ -1,46 +1,51 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { getCategories } from '../services/api';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
+import {getCategories, getProductsFromCategoryAndQuery} from '../services/api';
 
 class Home extends Component {
-  constructor() {
-    super();
-    this.state = {
-      categorias: [],
-      pesquisadoVazio: true,
-      pesquisado: [],
-    };
-  }
-
-  async componentDidMount() {
-    const response = await getCategories();
-    this.setState({ categorias: response });
-  }
-
-  pesquisaItemsPorTermo = async () => {
-    const input = document.getElementById('inputBusca');
-    const busca = input.value;
-    const ENDPOINT = `https://api.mercadolibre.com/sites/MLB/search?q=${busca}`;
-    const response = await fetch(ENDPOINT);
-    const respostaPesquisaPorTermo = await response.json();
-    const { results } = respostaPesquisaPorTermo;
-    this.setState({ pesquisado: results, pesquisadoVazio: false });
+  state = {
+    categorias: [],
+    pesquisadoVazio: true,
+    valueInput: '',
+    pesquisado: [],
   };
 
-  pesquisaItemsPorCategoria = async ({ target }) => {
-    const nomeCategoria = target.id;
-    const ENDPOINT = `https://api.mercadolibre.com/sites/MLB/search?q=${nomeCategoria}`;
-    const response = await fetch(ENDPOINT);
-    const items = await response.json();
-    const { results } = items;
-    this.setState({ pesquisado: results, pesquisadoVazio: false });
+  async componentDidMount() {
+    const categorias = await getCategories();
+    this.setState({categorias});
   }
 
+  handleChange = ({target}) => {
+    const valueInput = target.value;
+    this.setState(() => ({valueInput}));
+  };
+
+  pesquisaItemsPorTermo = async () => {
+    const {valueInput} = this.state;
+    const query = valueInput;
+    const response = await getProductsFromCategoryAndQuery({
+      category: '',
+      query,
+    });
+    const {results} = response;
+    this.setState({pesquisado: results, pesquisadoVazio: false});
+  };
+
+  pesquisaItemsPorCategoria = async ({target}) => {
+    const category = target.value;
+    const response = await getProductsFromCategoryAndQuery({
+      category,
+      query: '',
+    });
+    const {results} = response;
+    this.setState({pesquisado: results, pesquisadoVazio: false});
+  };
+
   verificaCampoPesquisa = () => {
-    const { pesquisadoVazio, pesquisado } = this.state;
+    const {pesquisadoVazio, pesquisado} = this.state;
     if (pesquisadoVazio) {
       return (
-        <p data-testid="home-initial-message">
+        <p data-testid='home-initial-message'>
           Digite algum termo de pesquisa ou escolha uma categoria.
         </p>
       );
@@ -52,51 +57,57 @@ class Home extends Component {
         </div>
       );
     }
-    return (
-      pesquisado.map((produto) => (
-        <div key={ produto.id } data-testid="product">
-          <p>{ produto.title }</p>
-          <img alt="sla" src={ produto.thumbnail } />
-          <p>{ produto.price }</p>
-        </div>
-      ))
-    );
-  }
+
+    return pesquisado.map((produto) => (
+      <div key={produto.id} data-testid='product'>
+        <p>{produto.title}</p>
+        <img alt='sla' src={produto.thumbnail} />
+        <p>{produto.price}</p>
+      </div>
+    ));
+  };
 
   render() {
-    const { categorias } = this.state;
+    const {categorias, valueInput} = this.state;
     const listaButtons = categorias.map((categorie) => (
       <button
-        type="button"
-        key={ categorie.id }
-        data-testid="category"
-        id={ categorie.name }
-        onClick={ this.pesquisaItemsPorCategoria }
+        type='button'
+        key={categorie.id}
+        data-testid='category'
+        id={categorie.name}
+        onClick={this.pesquisaItemsPorCategoria}
+        value={categorie.id}
       >
-        { categorie.name }
-      </button>));
+        {categorie.name}
+      </button>
+    ));
     return (
       <div>
-        {
-          listaButtons
-        }
+        {listaButtons}
         <div>
-          <Link to="/shoppingCart" data-testid="shopping-cart-button">Carrinho</Link>
+          <Link to='/shoppingCart' data-testid='shopping-cart-button'>
+            Carrinho
+          </Link>
         </div>
-        <label htmlFor="inputBusca">
+        <label htmlFor='inputBusca'>
           Pesquisar:
-          <input id="inputBusca" type="text" data-testid="query-input" />
+          <input
+            id='inputBusca'
+            type='text'
+            data-testid='query-input'
+            name='valueInput'
+            value={valueInput}
+            onChange={this.handleChange}
+          />
         </label>
         <button
-          type="button"
-          data-testid="query-button"
-          onClick={ this.pesquisaItemsPorTermo }
+          type='button'
+          data-testid='query-button'
+          onClick={this.pesquisaItemsPorTermo}
         >
           Enviar
         </button>
-        {
-          this.verificaCampoPesquisa()
-        }
+        {this.verificaCampoPesquisa()}
       </div>
     );
   }
