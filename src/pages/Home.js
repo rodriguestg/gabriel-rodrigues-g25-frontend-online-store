@@ -4,111 +4,112 @@ import {getCategories, getProductsFromCategoryAndQuery} from '../services/api';
 
 class Home extends Component {
   state = {
-    categorias: [],
-    pesquisadoVazio: true,
-    valueInput: '',
-    pesquisado: [],
+    categories: [],
+    searchTerm: '',
+    searchResults: [],
+    searchMessage: 'initial',
   };
 
+  // Realiza a requisição das categorias de produtos.
   async componentDidMount() {
-    const categorias = await getCategories();
-    this.setState({categorias});
+    const categories = await getCategories();
+    this.setState({categories});
   }
 
+  // Controla o valor da barra de pesquisa.
   handleChange = ({target}) => {
-    const valueInput = target.value;
-    this.setState(() => ({valueInput}));
+    const searchTerm = target.value;
+    this.setState(() => ({searchTerm}));
   };
 
-  pesquisaItemsPorTermo = async () => {
-    const {valueInput} = this.state;
-    const query = valueInput;
+  // Realiza uma busca através de um termo específico.
+  searchItemsByTerm = async () => {
+    const {searchTerm} = this.state;
     const response = await getProductsFromCategoryAndQuery({
       category: '',
-      query,
-    });
-    const {results} = response;
-    this.setState({pesquisado: results, pesquisadoVazio: false});
+      query: searchTerm,
+    });    
+    const searchMessage = response.results.length === 0 ? 'null' : 'search';
+    this.setState({searchResults: response.results, searchMessage});
   };
 
-  pesquisaItemsPorCategoria = async ({target}) => {
-    const category = target.value;
+  // Realiza uma busca através de uma categoria.
+  searchItemsByCategorie = async ({target: {value}}) => {
     const response = await getProductsFromCategoryAndQuery({
-      category,
+      category: value,
       query: '',
     });
-    const {results} = response;
-    this.setState({pesquisado: results, pesquisadoVazio: false});
-  };
-
-  verificaCampoPesquisa = () => {
-    const {pesquisadoVazio, pesquisado} = this.state;
-    if (pesquisadoVazio) {
-      return (
-        <p data-testid='home-initial-message'>
-          Digite algum termo de pesquisa ou escolha uma categoria.
-        </p>
-      );
-    }
-    if (pesquisado.length === 0) {
-      return (
-        <div>
-          <p>Nenhum produto foi encontrado</p>
-        </div>
-      );
-    }
-
-    return pesquisado.map((produto) => (
-      <div key={produto.id} data-testid='product'>
-        <p>{produto.title}</p>
-        <img alt='sla' src={produto.thumbnail} />
-        <p>{produto.price}</p>
-      </div>
-    ));
+    const searchMessage = response.results.length === 0 ? 'null' : 'search';
+    this.setState({searchResults: response.results, searchMessage});
   };
 
   render() {
-    const {categorias, valueInput} = this.state;
-    const listaButtons = categorias.map((categorie) => (
-      <button
-        type='button'
-        key={categorie.id}
-        data-testid='category'
-        id={categorie.name}
-        onClick={this.pesquisaItemsPorCategoria}
-        value={categorie.id}
-      >
-        {categorie.name}
-      </button>
-    ));
+    const {categories, searchTerm, searchResults, searchMessage} = this.state;
+
+    // Mensagens para "tela inicial" e "sem resultados de busca".
+    const initialResults = (
+      <p data-testid='home-initial-message'>
+        Digite algum termo de pesquisa ou escolha uma categoria.
+      </p>
+    );
+    const nullResults = <p>Nenhum produto foi encontrado</p>;
+
     return (
-      <div>
-        {listaButtons}
-        <div>
-          <Link to='/shoppingCart' data-testid='shopping-cart-button'>
-            Carrinho
-          </Link>
+      <>
+        {/* Barra de categorias de produtos. */}
+        {categories.map((categorie) => (
+          <button
+            key={categorie.id}
+            data-testid='category'
+            id={categorie.name}
+            type='button'
+            value={categorie.id}
+            onClick={this.searchItemsByCategorie}
+          >
+            {categorie.name}
+          </button>
+        ))}
+
+        {/* Link para o carrinho de compras. */}
+        <Link to='/shoppingCart' data-testid='shopping-cart-button'>
+          <h3>Carrinho</h3>
+        </Link>
+
+        {/* Barra de pesquisa de produtos. */}
+        <div id='searchBar'>
+          <label htmlFor='searchField'>
+            Digite o termo de pesquisa:
+            <input
+              data-testid='query-input'
+              id='searchField'
+              type='text'
+              name='searchTerm'
+              value={searchTerm}
+              onChange={this.handleChange}
+            />
+          </label>
+
+          <button
+            data-testid='query-button'
+            type='searchButton'
+            onClick={this.searchItemsByTerm}
+          >
+            Pesquisar
+          </button>
         </div>
-        <label htmlFor='inputBusca'>
-          Pesquisar:
-          <input
-            id='inputBusca'
-            type='text'
-            data-testid='query-input'
-            name='valueInput'
-            value={valueInput}
-            onChange={this.handleChange}
-          />
-        </label>
-        <button
-          type='button'
-          data-testid='query-button'
-          onClick={this.pesquisaItemsPorTermo}
-        >
-          Enviar
-        </button>
-        {this.verificaCampoPesquisa()}
-      </div>
+
+        {/* Resultados de pesquisa de produtos. */}
+        {searchMessage === 'initial' && initialResults}
+        {searchMessage === 'null' && nullResults}
+        {searchMessage === 'search' &&
+          searchResults.map((product) => (
+            <div key={product.id} data-testid='product'>
+              <p>{product.title}</p>
+              <img alt={product.title} src={product.thumbnail} />
+              <p>{product.price}</p>
+            </div>
+          ))}
+      </>
     );
   }
 }

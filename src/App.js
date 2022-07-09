@@ -1,15 +1,21 @@
 import React, {Component} from 'react';
-import {Switch, Route} from 'react-router-dom';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import Home from './pages/Home';
 import ShoppingCart from './pages/ShoppingCart';
 
 class App extends Component {
+  // Renderiza as rotas da aplicação.
   render() {
     return (
-      <Switch>
-        <Route exact path='/' component={Home} />
-        <Route exact path='/shoppingCart' component={ShoppingCart} />
-      </Switch>
+      <>
+        <h1>FrontEnd Online Store</h1>
+        <BrowserRouter>
+          <Switch>
+            <Route exact path='/' component={Home} />
+            <Route exact path='/shoppingcart' component={ShoppingCart} />
+          </Switch>
+        </BrowserRouter>
+      </>
     );
   }
 }

@@ -7,11 +7,9 @@ export async function getCategories() {
 }
 
 // Realiza a importação de produtos conforme categoria e/ou palavra-chave.
-export async function getProductsFromCategoryAndQuery(parameters) {
-  const category = parameters.category;
-  const query = parameters.query;
+export async function getProductsFromCategoryAndQuery({category, query}) {
   const ENDPOINT = `https://api.mercadolibre.com/sites/MLB/search?category=${category}&q=${query}`;
   const response = await fetch(ENDPOINT);
-  const categoriesAndQuery = await response.json();
+  const categoriesAndQuery = response.json();
   return categoriesAndQuery;
 }
