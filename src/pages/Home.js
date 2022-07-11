@@ -1,103 +1,118 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { getCategories } from '../services/api';
+import {
+  getCategories,
+  getProductsFromCategoryAndQuery,
+} from '../services/api';
 
 class Home extends Component {
-  constructor() {
-    super();
-    this.state = {
-      categorias: [],
-      pesquisadoVazio: true,
-      pesquisado: [],
-    };
-  }
-
-  async componentDidMount() {
-    const response = await getCategories();
-    this.setState({ categorias: response });
-  }
-
-  pesquisaItemsPorTermo = async () => {
-    const input = document.getElementById('inputBusca');
-    const busca = input.value;
-    const ENDPOINT = `https://api.mercadolibre.com/sites/MLB/search?q=${busca}`;
-    const response = await fetch(ENDPOINT);
-    const respostaPesquisaPorTermo = await response.json();
-    const { results } = respostaPesquisaPorTermo;
-    this.setState({ pesquisado: results, pesquisadoVazio: false });
+  state = {
+    categories: [],
+    searchTerm: '',
+    searchResults: [],
+    searchMessage: 'initial',
   };
 
-  pesquisaItemsPorCategoria = async ({ target }) => {
-    const nomeCategoria = target.id;
-    const ENDPOINT = `https://api.mercadolibre.com/sites/MLB/search?q=${nomeCategoria}`;
-    const response = await fetch(ENDPOINT);
-    const items = await response.json();
-    const { results } = items;
-    this.setState({ pesquisado: results, pesquisadoVazio: false });
+  // Realiza a requisição das categorias de produtos.
+  async componentDidMount() {
+    const categories = await getCategories();
+    this.setState({ categories });
   }
 
-  verificaCampoPesquisa = () => {
-    const { pesquisadoVazio, pesquisado } = this.state;
-    if (pesquisadoVazio) {
-      return (
-        <p data-testid="home-initial-message">
-          Digite algum termo de pesquisa ou escolha uma categoria.
-        </p>
-      );
-    }
-    if (pesquisado.length === 0) {
-      return (
-        <div>
-          <p>Nenhum produto foi encontrado</p>
-        </div>
-      );
-    }
-    return (
-      pesquisado.map((produto) => (
-        <div key={ produto.id } data-testid="product">
-          <p>{ produto.title }</p>
-          <img alt="sla" src={ produto.thumbnail } />
-          <p>{ produto.price }</p>
-        </div>
-      ))
-    );
-  }
+  // Controla o valor da barra de pesquisa.
+  handleChange = ({ target }) => {
+    const searchTerm = target.value;
+    this.setState(() => ({ searchTerm }));
+  };
+
+  // Realiza uma busca através de um termo específico.
+  searchItemsByTerm = async () => {
+    const { searchTerm } = this.state;
+    const response = await getProductsFromCategoryAndQuery({
+      category: '',
+      query: searchTerm,
+    });
+    const searchMessage = response.results.length === 0 ? 'null' : 'search';
+    this.setState({ searchResults: response.results, searchMessage });
+  };
+
+  // Realiza uma busca através de uma categoria.
+  searchItemsByCategorie = async ({ target: { value } }) => {
+    const response = await getProductsFromCategoryAndQuery({
+      category: value,
+      query: '',
+    });
+    const searchMessage = response.results.length === 0 ? 'null' : 'search';
+    this.setState({ searchResults: response.results, searchMessage });
+  };
 
   render() {
-    const { categorias } = this.state;
-    const listaButtons = categorias.map((categorie) => (
-      <button
-        type="button"
-        key={ categorie.id }
-        data-testid="category"
-        id={ categorie.name }
-        onClick={ this.pesquisaItemsPorCategoria }
-      >
-        { categorie.name }
-      </button>));
+    const { categories, searchTerm, searchResults, searchMessage } = this.state;
+
+    // Mensagens para "tela inicial" e "sem resultados de busca".
+    const initialResults = (
+      <p data-testid="home-initial-message">
+        Digite algum termo de pesquisa ou escolha uma categoria.
+      </p>
+    );
+    const nullResults = <p>Nenhum produto foi encontrado</p>;
+
     return (
-      <div>
-        {
-          listaButtons
-        }
-        <div>
-          <Link to="/shoppingCart" data-testid="shopping-cart-button">Carrinho</Link>
+      <>
+        {/* Barra de categorias de produtos. */}
+        {categories.map((categorie) => (
+          <button
+            key={ categorie.id }
+            data-testid="category"
+            id={ categorie.name }
+            type="button"
+            value={ categorie.id }
+            onClick={ this.searchItemsByCategorie }
+          >
+            {categorie.name}
+          </button>
+        ))}
+
+        {/* Link para o carrinho de compras. */}
+        <Link to="/shoppingCart" data-testid="shopping-cart-button">
+          <h3>Carrinho</h3>
+        </Link>
+
+        {/* Barra de pesquisa de produtos. */}
+        <div id="searchBar">
+          <label htmlFor="searchField">
+            Digite o termo de pesquisa:
+            <input
+              data-testid="query-input"
+              id="searchField"
+              type="text"
+              name="searchTerm"
+              value={ searchTerm }
+              onChange={ this.handleChange }
+            />
+          </label>
+
+          <button
+            data-testid="query-button"
+            type="button"
+            onClick={ this.searchItemsByTerm }
+          >
+            Pesquisar
+          </button>
         </div>
-        <label htmlFor="inputBusca">
-          Pesquisar:
-          <input id="inputBusca" type="text" data-testid="query-input" />
-        </label>
-        <button
-          type="button"
-          data-testid="query-button"
-          onClick={ this.pesquisaItemsPorTermo }
-        >
-          Enviar
-        </button>
-        {
-          this.verificaCampoPesquisa()
-        }
-      </div>
+
+        {/* Resultados de pesquisa de produtos. */}
+        {searchMessage === 'initial' && initialResults}
+        {searchMessage === 'null' && nullResults}
+        {searchMessage === 'search'
+          && searchResults.map((product) => (
+            <div key={ product.id } data-testid="product">
+              <p>{product.title}</p>
+              <img alt={ product.title } src={ product.thumbnail } />
+              <p>{product.price}</p>
+            </div>
+          ))}
+      </>
     );
   }
 }
