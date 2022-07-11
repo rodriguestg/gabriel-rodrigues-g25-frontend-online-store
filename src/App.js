@@ -11,8 +11,8 @@ class App extends Component {
         <h1>FrontEnd Online Store</h1>
         <BrowserRouter>
           <Switch>
-            <Route exact path='/' component={Home} />
-            <Route exact path='/shoppingcart' component={ShoppingCart} />
+            <Route exact path="/" component={ Home } />
+            <Route exact path="/shoppingcart" component={ ShoppingCart } />
           </Switch>
         </BrowserRouter>
       </>

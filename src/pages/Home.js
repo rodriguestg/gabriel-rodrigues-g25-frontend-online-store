@@ -51,7 +51,7 @@ class Home extends Component {
 
     // Mensagens para "tela inicial" e "sem resultados de busca".
     const initialResults = (
-      <p data-testid='home-initial-message'>
+      <p data-testid="home-initial-message">
         Digite algum termo de pesquisa ou escolha uma categoria.
       </p>
     );
@@ -62,40 +62,40 @@ class Home extends Component {
         {/* Barra de categorias de produtos. */}
         {categories.map((categorie) => (
           <button
-            key={categorie.id}
-            data-testid='category'
-            id={categorie.name}
-            type='button'
-            value={categorie.id}
-            onClick={this.searchItemsByCategorie}
+            key={ categorie.id }
+            data-testid="category"
+            id={ categorie.name }
+            type="button"
+            value={ categorie.id }
+            onClick={ this.searchItemsByCategorie }
           >
             {categorie.name}
           </button>
         ))}
 
         {/* Link para o carrinho de compras. */}
-        <Link to='/shoppingCart' data-testid='shopping-cart-button'>
+        <Link to="/shoppingCart" data-testid="shopping-cart-button">
           <h3>Carrinho</h3>
         </Link>
 
         {/* Barra de pesquisa de produtos. */}
-        <div id='searchBar'>
-          <label htmlFor='searchField'>
+        <div id="searchBar">
+          <label htmlFor="searchField">
             Digite o termo de pesquisa:
             <input
-              data-testid='query-input'
-              id='searchField'
-              type='text'
-              name='searchTerm'
-              value={searchTerm}
-              onChange={this.handleChange}
+              data-testid="query-input"
+              id="searchField"
+              type="text"
+              name="searchTerm"
+              value={ searchTerm }
+              onChange={ this.handleChange }
             />
           </label>
 
           <button
-            data-testid='query-button'
-            type='searchButton'
-            onClick={this.searchItemsByTerm}
+            data-testid="query-button"
+            type="button"
+            onClick={ this.searchItemsByTerm }
           >
             Pesquisar
           </button>
@@ -104,11 +104,11 @@ class Home extends Component {
         {/* Resultados de pesquisa de produtos. */}
         {searchMessage === 'initial' && initialResults}
         {searchMessage === 'null' && nullResults}
-        {searchMessage === 'search' &&
-          searchResults.map((product) => (
-            <div key={product.id} data-testid='product'>
+        {searchMessage === 'search'
+          && searchResults.map((product) => (
+            <div key={ product.id } data-testid="product">
               <p>{product.title}</p>
-              <img alt={product.title} src={product.thumbnail} />
+              <img alt={ product.title } src={ product.thumbnail } />
               <p>{product.price}</p>
             </div>
           ))}
