@@ -1,6 +1,9 @@
-import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
-import {getCategories, getProductsFromCategoryAndQuery} from '../services/api';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  getCategories,
+  getProductsFromCategoryAndQuery,
+} from '../services/api';
 
 class Home extends Component {
   state = {
@@ -13,38 +16,38 @@ class Home extends Component {
   // Realiza a requisição das categorias de produtos.
   async componentDidMount() {
     const categories = await getCategories();
-    this.setState({categories});
+    this.setState({ categories });
   }
 
   // Controla o valor da barra de pesquisa.
-  handleChange = ({target}) => {
+  handleChange = ({ target }) => {
     const searchTerm = target.value;
-    this.setState(() => ({searchTerm}));
+    this.setState(() => ({ searchTerm }));
   };
 
   // Realiza uma busca através de um termo específico.
   searchItemsByTerm = async () => {
-    const {searchTerm} = this.state;
+    const { searchTerm } = this.state;
     const response = await getProductsFromCategoryAndQuery({
       category: '',
       query: searchTerm,
-    });    
+    });
     const searchMessage = response.results.length === 0 ? 'null' : 'search';
-    this.setState({searchResults: response.results, searchMessage});
+    this.setState({ searchResults: response.results, searchMessage });
   };
 
   // Realiza uma busca através de uma categoria.
-  searchItemsByCategorie = async ({target: {value}}) => {
+  searchItemsByCategorie = async ({ target: { value } }) => {
     const response = await getProductsFromCategoryAndQuery({
       category: value,
       query: '',
     });
     const searchMessage = response.results.length === 0 ? 'null' : 'search';
-    this.setState({searchResults: response.results, searchMessage});
+    this.setState({ searchResults: response.results, searchMessage });
   };
 
   render() {
-    const {categories, searchTerm, searchResults, searchMessage} = this.state;
+    const { categories, searchTerm, searchResults, searchMessage } = this.state;
 
     // Mensagens para "tela inicial" e "sem resultados de busca".
     const initialResults = (
