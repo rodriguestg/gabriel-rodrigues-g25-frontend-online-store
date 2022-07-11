@@ -107,7 +107,6 @@ class Home extends Component {
             Pesquisar
           </button>
         </div>
-        {/* https://api.mercadolibre.com/items/$PRODUCT_ID */}
         {/* Resultados de pesquisa de produtos. */}
         {searchMessage === 'initial' && initialResults}
         {searchMessage === 'null' && nullResults}

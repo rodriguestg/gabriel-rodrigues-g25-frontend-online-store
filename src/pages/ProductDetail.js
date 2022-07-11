@@ -5,7 +5,6 @@ class ProductDetail extends Component {
   state = {
     idInfos: {},
   }
-  // anotação
 
   async componentDidMount() {
     const { match: { params: { id } } } = this.props;
