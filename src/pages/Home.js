@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import {
   getCategories,
   getProductsFromCategoryAndQuery,
@@ -24,6 +25,12 @@ class Home extends Component {
     const searchTerm = target.value;
     this.setState(() => ({ searchTerm }));
   };
+
+  handleClick = ({ target }) => {
+    const { history } = this.props;
+    const { id } = target;
+    history.push(`/productdetail/${id}`);
+  }
 
   // Realiza uma busca através de um termo específico.
   searchItemsByTerm = async () => {
@@ -100,16 +107,26 @@ class Home extends Component {
             Pesquisar
           </button>
         </div>
-
         {/* Resultados de pesquisa de produtos. */}
         {searchMessage === 'initial' && initialResults}
         {searchMessage === 'null' && nullResults}
         {searchMessage === 'search'
           && searchResults.map((product) => (
-            <div key={ product.id } data-testid="product">
+            <div
+              key={ product.id }
+              data-testid="product"
+            >
               <p>{product.title}</p>
               <img alt={ product.title } src={ product.thumbnail } />
               <p>{product.price}</p>
+              <button
+                id={ product.id }
+                data-testid="product-detail-link"
+                type="button"
+                onClick={ this.handleClick }
+              >
+                Detalhes
+              </button>
             </div>
           ))}
       </>
@@ -118,3 +135,9 @@ class Home extends Component {
 }
 
 export default Home;
+
+Home.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+};
