@@ -26,6 +26,8 @@ class ProductDetail extends Component {
   }
 }
 
+// asasasas
+
 export default ProductDetail;
 
 ProductDetail.propTypes = {
