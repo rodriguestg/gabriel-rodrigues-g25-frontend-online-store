@@ -26,7 +26,7 @@ class Home extends Component {
     this.setState(() => ({ searchTerm }));
   };
 
-  handleClick = ({ target }) => {
+  handleClickDetails = ({ target }) => {
     const { history } = this.props;
     const { id } = target;
     history.push(`/productdetail/${id}`);
@@ -63,6 +63,7 @@ class Home extends Component {
       </p>
     );
     const nullResults = <p>Nenhum produto foi encontrado</p>;
+    const { handleClickCart } = this.props;
 
     return (
       <>
@@ -123,9 +124,17 @@ class Home extends Component {
                 id={ product.id }
                 data-testid="product-detail-link"
                 type="button"
-                onClick={ this.handleClick }
+                onClick={ this.handleClickDetails }
               >
                 Detalhes
+              </button>
+              <button
+                id={ product.id }
+                data-testid="product-add-to-cart"
+                type="button"
+                onClick={ handleClickCart }
+              >
+                Adicionar ao carrinho
               </button>
             </div>
           ))}
@@ -140,4 +149,5 @@ Home.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
+  handleClickCart: PropTypes.func.isRequired,
 };
