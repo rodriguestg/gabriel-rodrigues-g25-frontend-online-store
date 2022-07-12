@@ -20,7 +20,6 @@ class ProductDetail extends Component {
     const { handleClickCart } = this.props;
     return (
       <div>
-        {/* Link para o carrinho de compras. */}
         <Link to="/shoppingCart" data-testid="shopping-cart-button">
           <h3>Carrinho</h3>
         </Link>
@@ -28,9 +27,9 @@ class ProductDetail extends Component {
         <img alt="product-detail" src={ idInfos.thumbnail } />
         <p>{ idInfos.price }</p>
         <button
-          id={ idInfos.id }
-          data-testid="product-detail-add-to-cart"
           type="button"
+          data-testid="product-detail-add-to-cart"
+          id={ idInfos.id }
           onClick={ handleClickCart }
         >
           Adicionar ao carrinho

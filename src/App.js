@@ -8,28 +8,17 @@ class App extends Component {
   // Renderiza as rotas da aplicação.
   state = {
     productUp: '',
-    products: [],
   }
 
   handleClickCartId = ({ target }) => {
     const { id } = target;
     this.setState({
       productUp: id,
-    }, () => this.addProduct());
-  }
-
-  addProduct = async () => {
-    const { productUp } = this.state;
-    const ENDPOINT = `https://api.mercadolibre.com/items/${productUp}`;
-    const response = await fetch(ENDPOINT);
-    const productAdd = await response.json();
-    this.setState(({ products }) => ({
-      products: [...products, productAdd],
-    }));
+    });
   }
 
   render() {
-    const { products } = this.state;
+    const { productUp } = this.state;
     return (
       <>
         <h1>FrontEnd Online Store</h1>
@@ -45,15 +34,10 @@ class App extends Component {
             <Route
               path="/shoppingcart"
               render={ (props) => (
-                <ShoppingCart
-                  { ...props }
-                  productsAll={ products }
-                  add={ this.addProduct }
-                />
+                <ShoppingCart { ...props } productUp={ productUp } />
               ) }
             />
             <Route
-              exact
               path="/productdetail/:id"
               render={ (props) => (
                 <ProductDetail { ...props } handleClickCart={ this.handleClickCartId } />
