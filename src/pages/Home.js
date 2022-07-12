@@ -120,6 +120,7 @@ class Home extends Component {
               <p>{product.title}</p>
               <img alt={ product.title } src={ product.thumbnail } />
               <p>{product.price}</p>
+              {/* Botão que direciona para a página com os detalhes do produto */}
               <button
                 id={ product.id }
                 data-testid="product-detail-link"
@@ -128,6 +129,7 @@ class Home extends Component {
               >
                 Detalhes
               </button>
+              {/* Botão que adiciona o produto ao carrinho de compras */}
               <button
                 id={ product.id }
                 data-testid="product-add-to-cart"

@@ -4,31 +4,18 @@ import { Link } from 'react-router-dom';
 
 class ShoppingCart extends Component {
   state = {
-    cartEmpty: true,
-    productUpdate: undefined,
+    cartEmpty: false,
     products: [],
   }
 
   async componentDidMount() {
-    const { productUp } = this.props;
-    this.setState({
-      productUpdate: productUp,
-    }, () => {
-      const { productUpdate } = this.state;
-      if (productUpdate) { this.addProduct(); }
-      console.log('haha');
-    });
-  }
-
-  addProduct = async () => {
-    const { productUpdate } = this.state;
-    const ENDPOINT = `https://api.mercadolibre.com/items/${productUpdate}`;
-    const response = await fetch(ENDPOINT);
-    const productAdd = await response.json();
-    this.setState(({ products }) => ({
-      cartEmpty: false,
-      products: [...products, productAdd],
-    }));
+    const { productsAll } = this.props;
+    if (productsAll.length !== 0) {
+      this.setState({
+        products: productsAll,
+        cartEmpty: true,
+      });
+    }
   }
 
   renderCart = () => {
@@ -38,16 +25,10 @@ class ShoppingCart extends Component {
         <p data-testid="shopping-cart-product-name">{ product.title }</p>
         <img alt="" src={ product.thumbnail } />
         <p>{ product.price }</p>
-        <p data-testid="shopping-cart-product-quantity">1 Produto</p>
+        <p data-testid="shopping-cart-product-quantity"> X Produto</p>
       </div>
     ));
   };
-
-  clear = () => {
-    this.setState({
-      productUpdate: undefined,
-    });
-  }
 
   render() {
     const { cartEmpty } = this.state;
@@ -58,9 +39,9 @@ class ShoppingCart extends Component {
     );
     return (
       <section>
-        { cartEmpty ? cartInitial : this.renderCart() }
+        { cartEmpty ? this.renderCart() : cartInitial }
         <Link to="/">
-          <button type="button" onClick={ this.clear }>Voltar</button>
+          <button type="button">Voltar</button>
         </Link>
       </section>
     );
@@ -73,5 +54,5 @@ ShoppingCart.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.objectOf(PropTypes.string),
   }).isRequired,
-  productUp: PropTypes.string.isRequired,
+  productsAll: PropTypes.string.isRequired,
 };
