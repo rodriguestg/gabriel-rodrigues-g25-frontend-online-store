@@ -18,13 +18,14 @@ class ProductDetail extends Component {
   render() {
     const { handleClickCart } = this.props;
     const { idInfos } = this.state;
+    const { handleClickCart } = this.props;
     return (
       <div>
         <Link to="/shoppingCart" data-testid="shopping-cart-button">
           <h3>Carrinho</h3>
         </Link>
         <p data-testid="product-detail-name">{ idInfos.title }</p>
-        <img alt="" src={ idInfos.thumbnail } />
+        <img alt="product-detail" src={ idInfos.thumbnail } />
         <p>{ idInfos.price }</p>
         <button
           type="button"
@@ -38,8 +39,6 @@ class ProductDetail extends Component {
     );
   }
 }
-
-// asasasas
 
 export default ProductDetail;
 
