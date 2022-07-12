@@ -16,7 +16,6 @@ class ProductDetail extends Component {
   }
 
   render() {
-    const { handleClickCart } = this.props;
     const { idInfos } = this.state;
     const { handleClickCart } = this.props;
     return (

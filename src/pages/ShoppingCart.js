@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 
 class ShoppingCart extends Component {
   state = {
-    cartEmpty: false,
+    cartEmpty: true,
+    productUpdate: undefined,
     products: [],
   }
 
@@ -36,10 +37,16 @@ class ShoppingCart extends Component {
         <p data-testid="shopping-cart-product-name">{ product.title }</p>
         <img alt="" src={ product.thumbnail } />
         <p>{ product.price }</p>
-        <p data-testid="shopping-cart-product-quantity"> X Produto</p>
+        <p data-testid="shopping-cart-product-quantity">1 Produto</p>
       </div>
     ));
   };
+
+  clear = () => {
+    this.setState({
+      productUpdate: undefined,
+    });
+  }
 
   render() {
     const { cartEmpty } = this.state;
@@ -50,9 +57,9 @@ class ShoppingCart extends Component {
     );
     return (
       <section>
-        { cartEmpty ? this.renderCart() : cartInitial }
+        { cartEmpty ? cartInitial : this.renderCart() }
         <Link to="/">
-          <button type="button">Voltar</button>
+          <button type="button" onClick={ this.clear }>Voltar</button>
         </Link>
       </section>
     );
@@ -65,5 +72,5 @@ ShoppingCart.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.objectOf(PropTypes.string),
   }).isRequired,
-  productsAll: PropTypes.string.isRequired,
+  productUp: PropTypes.string.isRequired,
 };
