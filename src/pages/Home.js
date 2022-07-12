@@ -12,6 +12,7 @@ class Home extends Component {
     searchTerm: '',
     searchResults: [],
     searchMessage: 'initial',
+    cart: [],
   };
 
   // Realiza a requisição das categorias de produtos.
@@ -145,11 +146,13 @@ class Home extends Component {
   }
 }
 
-export default Home;
-
 Home.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
   handleClickCart: PropTypes.func.isRequired,
 };
+
+export default Home;
+
+

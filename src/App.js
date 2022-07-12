@@ -6,43 +6,15 @@ import ProductDetail from './pages/ProductDetail';
 
 class App extends Component {
   // Renderiza as rotas da aplicação.
-  state = {
-    productUp: '',
-  }
-
-  handleClickCartId = ({ target }) => {
-    const { id } = target;
-    this.setState({
-      productUp: id,
-    });
-  }
-
   render() {
-    const { productUp } = this.state;
     return (
       <>
         <h1>FrontEnd Online Store</h1>
         <BrowserRouter>
           <Switch>
-            <Route
-              exact
-              path="/"
-              render={ (props) => (
-                <Home { ...props } handleClickCart={ this.handleClickCartId } />
-              ) }
-            />
-            <Route
-              path="/shoppingcart"
-              render={ (props) => (
-                <ShoppingCart { ...props } productUp={ productUp } />
-              ) }
-            />
-            <Route
-              path="/productdetail/:id"
-              render={ (props) => (
-                <ProductDetail { ...props } handleClickCart={ this.handleClickCartId } />
-              ) }
-            />
+            <Route exact path="/" component={ Home } />
+            <Route path="/shoppingcart" component={ ShoppingCart } />
+            <Route path="/productdetail/:id" component={ ProductDetail } />
           </Switch>
         </BrowserRouter>
       </>
