@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 class ProductDetail extends Component {
   state = {
@@ -15,12 +16,24 @@ class ProductDetail extends Component {
   }
 
   render() {
+    const { handleClickCart } = this.props;
     const { idInfos } = this.state;
     return (
       <div>
+        <Link to="/shoppingCart" data-testid="shopping-cart-button">
+          <h3>Carrinho</h3>
+        </Link>
         <p data-testid="product-detail-name">{ idInfos.title }</p>
         <img alt="" src={ idInfos.thumbnail } />
         <p>{ idInfos.price }</p>
+        <button
+          type="button"
+          data-testid="product-detail-add-to-cart"
+          id={ idInfos.id }
+          onClick={ handleClickCart }
+        >
+          Adicionar ao carrinho
+        </button>
       </div>
     );
   }
@@ -34,4 +47,5 @@ ProductDetail.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.objectOf(PropTypes.string),
   }).isRequired,
+  handleClickCart: PropTypes.func.isRequired,
 };

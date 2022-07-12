@@ -16,7 +16,6 @@ class ShoppingCart extends Component {
     }, () => {
       const { productUpdate } = this.state;
       if (productUpdate) { this.addProduct(); }
-      console.log('haha');
     });
   }
 
