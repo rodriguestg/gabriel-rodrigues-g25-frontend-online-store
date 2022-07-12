@@ -15,7 +15,6 @@ class App extends Component {
     this.setState({
       productUp: id,
     });
-    console.log(id);
   }
 
   render() {
