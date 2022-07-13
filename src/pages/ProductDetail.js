@@ -1,18 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import starVoid from '../images/starVoid.png';
-import starFull from '../images/starFull.png';
 import { getProductData } from '../services/api';
 
 class ProductDetail extends Component {
   state = {
     currentProduct: {},
-    currentEvaluation: {
-      email: '',
-      rating: 0,
-      evaluation: '',
-    },
   };
 
   // Realiza a requisição das informações do produto e recupera o carrinho da Local Storage.
@@ -23,72 +16,16 @@ class ProductDetail extends Component {
       },
     } = this.props;
 
-    const recoverEvaluations = localStorage.getItem('evaluations');
-    const evaluations = recoverEvaluations === null ? {} : JSON.parse(recoverEvaluations);
-    const listEvaluations = Object.keys(evaluations);
-    const currentEvaluation = listEvaluations.includes(id)
-      ? {
-        email: evaluations[id].email,
-        rating: evaluations[id].rating,
-        evaluation: evaluations[id].evaluation,
-      }
-      : { email: '', rating: 0, evaluation: '' };
-
     this.setState({
       currentProduct: await getProductData(id),
-      currentEvaluation,
     });
   }
-
-  handleChange = ({ target }) => {
-    const property = target.name;
-    const newValue = target.value;
-
-    this.setState((previousState) => ({
-      currentEvaluation: {
-        ...previousState.currentEvaluation,
-        [property]: newValue,
-      },
-    }));
-  };
-
-  handleClick = (currentEvaluation) => {
-    const { updatestate } = this.props;
-    const { currentProduct } = this.state;
-    // this.setState({
-    //   currentEvaluation: {
-    //     email: '',
-    //     rating: 0,
-    //     evaluation: '',
-    //   },
-    // });
-    updatestate({
-      data: {
-        productID: currentProduct.id,
-        currentEvaluation,
-      },
-      action: 'addProductEvaluation',
-    });
-  };
-
-  handleClickRating = ({ target }) => {
-    const rating = Number(target.name);
-    this.setState((previousState) => ({
-      currentEvaluation: {
-        ...previousState.currentEvaluation,
-        rating,
-      },
-    }));
-  };
 
   render() {
     const {
       currentProduct,
-      currentEvaluation: { email, rating, evaluation },
-      currentEvaluation,
     } = this.state;
     const { updatestate } = this.props;
-    const initialRating = ['A', 'B', 'C', 'D', 'E'];
 
     return (
       <>
@@ -118,73 +55,6 @@ class ProductDetail extends Component {
         >
           Adicionar ao carrinho
         </button>
-
-        <form>
-          <label htmlFor="product-detail-email">
-            e-mail:
-            <input
-              data-testid="product-detail-email"
-              id="product-detail-email"
-              type="text"
-              name="email"
-              value={ email }
-              onChange={ this.handleChange }
-            />
-          </label>
-          <label htmlFor="product-detail-evaluation">
-            Avaliação:
-            <textarea
-              data-testid="product-detail-evaluation"
-              id="product-detail-evaluation"
-              name="evaluation"
-              value={ evaluation }
-              onChange={ this.handleChange }
-            >
-              Escreva aqui sua avaliação.
-            </textarea>
-          </label>
-          <span>
-            {initialRating.map((item, index) => (
-              <span key={ `${item + 1 + index}` }>
-                {index + 1 <= rating ? (
-                  <div
-                    role="button"
-                    tabIndex={ index }
-                    onKeyPress={ this.handleClickRating }
-                    data-testid={ `${index + 1}-rating` }
-                  >
-                    <img
-                      name={ `${index + 1}` }
-                      alt="star full"
-                      src={ starFull }
-                    />
-                  </div>
-                ) : (
-                  <div
-                    role="button"
-                    tabIndex={ index }
-                    onKeyPress={ this.handleClickRating }
-                    data-testid={ `${index + 1}-rating` }
-                    onClick={ this.handleClickRating }
-                  >
-                    <img
-                      name={ `${index + 1}` }
-                      alt="star void"
-                      src={ starVoid }
-                    />
-                  </div>
-                )}
-              </span>
-            ))}
-          </span>
-          <button
-            data-testid="submit-review-btn"
-            type="button"
-            onClick={ () => this.handleClick(currentEvaluation) }
-          >
-            Enviar Avaliação
-          </button>
-        </form>
       </>
     );
   }

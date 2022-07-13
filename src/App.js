@@ -6,7 +6,6 @@ import ProductDetail from './pages/ProductDetail';
 
 class App extends Component {
   state = {
-    evaluations: {},
     cart: {},
     //
     // evaluations:
@@ -38,44 +37,28 @@ class App extends Component {
         (previousState) => ({
           cart: { ...previousState.cart, [data.id]: product },
         }),
-        () => {
-          localStorage.setItem('cart', JSON.stringify(cart));
-        },
       );
       break;
     case 'increase':
       cart[data].quantity += unity;
       this.setState({ cart });
-      localStorage.setItem('cart', JSON.stringify(cart));
       break;
     case 'decrease':
       if (cart[data].quantity === unity) return;
       cart[data].quantity -= unity;
       this.setState({ cart });
-      localStorage.setItem('cart', JSON.stringify(cart));
       break;
     case 'remove':
       delete cart[data];
       this.setState({ cart });
-      localStorage.setItem('cart', JSON.stringify(cart));
-      break;
-    case 'addProductEvaluation':
-      this.setState((previousState) => ({
-        evaluations: { ...previousState.evaluations, [data.productID]: data.Evaluation },
-      }),
-      () => {
-        const { evaluations } = this.state;
-        localStorage.setItem('evaluations', JSON.stringify(evaluations));
-      });
       break;
     default:
       this.setState({ cart: {} });
-      localStorage.clear();
     }
   };
 
   render() {
-    const { evaluations, cart } = this.state;
+    const { cart } = this.state;
     return (
       <>
         <h1>FrontEnd Online Store</h1>
@@ -95,7 +78,6 @@ class App extends Component {
                   { ...props }
                   updatestate={ this.updateState }
                   cart={ cart }
-                  evaluations={ evaluations }
                 />
               ) }
             />
