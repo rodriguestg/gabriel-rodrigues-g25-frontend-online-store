@@ -4,73 +4,62 @@ import { Link } from 'react-router-dom';
 
 class ShoppingCart extends Component {
   state = {
-    cartEmpty: true,
-    productUpdate: undefined,
-    products: [],
+    cart: [],
   }
 
+  // Recupera o carrinho da Local Storage.
   async componentDidMount() {
-    const { productUp } = this.props;
-    this.setState({
-      productUpdate: productUp,
-    }, () => {
-      const { productUpdate } = this.state;
-      if (productUpdate) { this.addProduct(); }
-    });
-  }
-
-  addProduct = async () => {
-    const { productUpdate } = this.state;
-    const ENDPOINT = `https://api.mercadolibre.com/items/${productUpdate}`;
-    const response = await fetch(ENDPOINT);
-    const productAdd = await response.json();
-    this.setState(({ products }) => ({
-      cartEmpty: false,
-      products: [...products, productAdd],
-    }));
-  }
-
-  renderCart = () => {
-    const { products } = this.state;
-    return products.map((product) => (
-      <div key={ product.id }>
-        <p data-testid="shopping-cart-product-name">{ product.title }</p>
-        <img alt="" src={ product.thumbnail } />
-        <p>{ product.price }</p>
-        <p data-testid="shopping-cart-product-quantity">1 Produto</p>
-      </div>
-    ));
-  };
-
-  clear = () => {
-    this.setState({
-      productUpdate: undefined,
-    });
+    const previousCart = localStorage.getItem('cart');
+    const recoverCart = previousCart === null ? [] : Object.values(JSON.parse(previousCart));
+    const cart = recoverCart.map((item) => JSON.parse(item));
+    this.setState({ cart });
   }
 
   render() {
-    const { cartEmpty } = this.state;
-    const cartInitial = (
-      <div>
-        <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
-      </div>
+    const { cart } = this.state;
+
+    // Link para a página inicial.
+    const buttonHome = (
+      <Link to="/" >
+        <h3>Home</h3>
+      </Link>
     );
+
+    // Tela de carrinho vazio.
+    const cartNull = (
+      <>
+        {buttonHome}
+        <div>
+          <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
+        </div>
+      </>      
+    );
+
+    // Renderiza a tela de carrinho vazio caso não haja produtos.
+    if(cart.length === 0) return cartNull
+
     return (
-      <section>
-        { cartEmpty ? cartInitial : this.renderCart() }
-        <Link to="/">
-          <button type="button" onClick={ this.clear }>Voltar</button>
-        </Link>
-      </section>
+      <>        
+        {buttonHome}
+        <h4>Carrinho de compras</h4>
+        {cart.map((product) => (
+          <div key={ product.productData.id }>
+            <p data-testid="shopping-cart-product-name">
+              { product.productData.title }
+            </p>
+            <img
+              alt={ product.productData.title }
+              src={ product.productData.thumbnail }
+            />
+            <p>Preço: { product.productData.price }</p>
+            <p data-testid="shopping-cart-product-quantity">
+              { product.quantity }
+            </p>
+          </div>
+        ))}
+      </>
     );
   }
 }
 
 export default ShoppingCart;
-
-ShoppingCart.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.objectOf(PropTypes.string),
-  }).isRequired,
-  productUp: PropTypes.string.isRequired,
-};
