@@ -2,49 +2,16 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 class ShoppingCart extends Component {
-  state = {
-    cart: {},
-    minimumQuantity: 1,
-  }
-
-  // Recupera o carrinho da Local Storage.
-  componentDidMount() {
-    const { savecart } = this.props;
-    const cart = savecart === null || savecart === undefined
-    ? {} 
-    : savecart;
-    this.setState({ cart });
-  }
-
-  // Atualiza a quantidade de produtos e o carrinho da Local Storage.
-  updateQuantity = ( productID, action) => {
-    const { cart } = this.state;
-    const unit = 1;
-    let copyCart = JSON.parse(JSON.stringify(cart));
-
-    if(action === 'increase') {
-      copyCart[productID].quantity += unit;
-    }
-    if(action === 'decrease') {
-      if(cart[productID].quantity === unit) return;
-      copyCart[productID].quantity -= unit;
-    }
-    if(action === 'remove') {
-      delete copyCart[productID];
-    }
-
-    this.setState({cart: copyCart});
-    localStorage.setItem('cart', JSON.stringify(copyCart));
-  }
-
-  clearCart = () => {
-    this.setState({cart: {}});
-    localStorage.clear();
-  }
-
   render() {
-    const { cart } = this.state;
-    const { savecart } = this.props;
+    const { cart, updatestate } = this.props;
+    const temp = Object.keys(cart);
+    // console.log('Carrinho: ', cart)
+    // if(Object.keys(cart).length !== 0) {
+    //   console.log('1°: ', cart[temp[0]].productData.title);
+    //   if(cart[temp[1]]) {
+    //     console.log('2°: ', cart[temp[1]].productData.title);
+    //   }      
+    // }
 
     // Link para a página inicial.
     const buttonHome = (
@@ -53,8 +20,8 @@ class ShoppingCart extends Component {
       </Link>
     );
 
-    // Tela de carrinho vazio.
-    const cartNull = (
+    // Renderiza a tela de carrinho vazio caso não haja produtos.
+    if(Object.keys(cart).length === 0) return (
       <>
         {buttonHome}
         <div>
@@ -63,21 +30,20 @@ class ShoppingCart extends Component {
       </>      
     );
 
-    // Renderiza a tela de carrinho vazio caso não haja produtos.
-    // if(Object.keys(cart).length === 0) return cartNull;
-
     return (
       <>        
         {buttonHome}
         <h4>Carrinho de compras</h4>
         <button
           type='button'
-          onClick={ this.clearCart }
+          onClick={ () => updatestate({ 
+            data: '',
+            action: "clear"
+          })}
         >
           Limpar carrinho
         </button>
 
-        {console.log(savecart)}
         {/* Lista do carrinho de compras. */}
         {Object.entries(cart).map(([ id, product ]) => (
           <div key={ id }>
@@ -85,7 +51,7 @@ class ShoppingCart extends Component {
               { product.productData.title }
             </p>
             <img
-              alt={ product.productData.title }
+              alt="product thumbnail"
               src={ product.productData.thumbnail }
             />
             <p>Preço: { product.productData.price }</p>
@@ -96,20 +62,29 @@ class ShoppingCart extends Component {
               <button                
                 data-testid="product-increase-quantity"
                 type="button"
-                onClick={ () => this.updateQuantity( id, 'increase') }
+                onClick={ () => updatestate({ 
+                  data: id,
+                  action: "increase" 
+                })}
               >
                 + item
               </button>
               <button                
                 data-testid="product-decrease-quantity"
                 type="button"
-                onClick={ () => this.updateQuantity( id, 'decrease') }
+                onClick={ () => updatestate({ 
+                  data: id,
+                  action: "decrease" 
+                })}
               >
                 - item
               </button>
               <button
                 type="button"
-                onClick={ () => this.updateQuantity( id, 'remove') }
+                onClick={ () => updatestate({ 
+                  data: id,
+                  action: "remove" 
+                })}
               >
                 Remover item
               </button>

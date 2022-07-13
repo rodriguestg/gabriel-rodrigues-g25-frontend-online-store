@@ -33,38 +33,6 @@ class Home extends Component {
     history.push(`/productdetail/${productID}`);
   }
 
-  // Adiciona um NOVO item ao carrinho.
-  addProductCart = async (productID) => {
-    const unity = 1;
-
-    const product = {
-        quantity: unity,
-        productData: await getProductData(productID),
-        rating: null,
-        valuation: null,
-    };
-
-    this.setState({clientData: 12})
-    
-    // Atualiza o carrinho de compras no estado e na Local Storage.
-    // this.setState(
-    //   (previousState) => ({ 
-    //     cart: {
-    //       ...previousState.cart,
-    //       [productID]: product,
-    //     }
-    //   }),
-    //   () => {
-    //     const { cart } = this.state;
-    //     localStorage.setItem('cart', JSON.stringify(cart));
-    //     console.log(cart)
-    //   }
-    // ); 
-
-    console.log(this.state.clientData)
-    
-  }
-
   // Realiza uma busca através de um termo específico.
   searchItemsByTerm = async () => {
     const { searchTerm } = this.state;
@@ -92,8 +60,8 @@ class Home extends Component {
       searchTerm, 
       searchResults, 
       searchMessage,
-      cart,
     } = this.state;
+    const { updatestate } = this.props;
 
     // Mensagens para "tela inicial" e "sem resultados de busca".
     const initialResults = (
@@ -102,7 +70,6 @@ class Home extends Component {
       </p>
     );
     const nullResults = <p>Nenhum produto foi encontrado</p>;
-    console.log(this.state.clientData)
 
     return (
       <>
@@ -124,7 +91,6 @@ class Home extends Component {
         <Link 
           to="/shoppingcart" 
           data-testid="shopping-cart-button"
-          savecart={ cart }
         >
           <h3>Carrinho</h3>
         </Link>
@@ -161,7 +127,6 @@ class Home extends Component {
               key={ product.id }
               data-testid="product"
             >
-
               {/* Informações básicas sobre o produto. */}
               <p>{product.title}</p>
               <img alt={ product.title } src={ product.thumbnail } />
@@ -180,7 +145,10 @@ class Home extends Component {
               <button                
                 data-testid="product-add-to-cart"
                 type="button"
-                onClick={ () => this.addProductCart(product.id) }
+                onClick={ () => updatestate({ 
+                  data: product.id,
+                  action: "addProductCart" 
+                })}
               >
                 Adicionar ao carrinho
               </button>

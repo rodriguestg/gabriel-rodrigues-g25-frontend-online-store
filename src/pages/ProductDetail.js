@@ -6,48 +6,38 @@ import { getProductData } from '../services/api';
 class ProductDetail extends Component {
   state = {
     currentProduct: {},
-    cart: {},
+    currentValidation: {
+      email: '',
+      rating: 0,
+      evaluation: '',
+    },
   }
 
   // Realiza a requisição das informações do produto e recupera o carrinho da Local Storage.
   async componentDidMount() {
     const { match: { params: { id } } } = this.props;
-    const currentProduct = await getProductData(id);
-    const recoverCart = localStorage.getItem('cart');
-    const cart = recoverCart === null ? {} : JSON.parse(recoverCart);
-    this.setState({ currentProduct, cart });
+    this.setState({ currentProduct: await getProductData(id) });
   }
 
-  // Adiciona um NOVO item ao carrinho.
-  addProductCart = async () => {
-    const { currentProduct } = this.state;
-    const id = currentProduct.id;
-    const unity = 1;
+  handleChange = ({ target }) => {
+    const property = target.name;
+    const newValue = target.value;
 
-    const product = {
-      quantity: unity,
-      productData: currentProduct,
-      rating: null,
-      valuation: null,
-    };
-    
-    // Atualiza o carrinho de compras no estado e na Local Storage.
-    this.setState(
-      (previousState) => ({ 
-        cart: {
-          ...previousState.cart,
-          [id]: product,
-        }}
-      ),
-      () => {
-        const { cart } = this.state;
-        localStorage.setItem('cart', JSON.stringify(cart));
-      }
-    ); 
+    this.setState((previousState) => ({
+      currentValidation: { ...previousState.currentValidation, [property]: newValue },
+    }));
   }
 
   render() {
-    const { currentProduct, cart } = this.state;
+    const { 
+      currentProduct,
+      currentValidation: {
+        email,
+        rating,
+        evaluation,
+      }
+    } = this.state;
+    const { updatestate } = this.props;
 
     return (
       <>
@@ -60,11 +50,9 @@ class ProductDetail extends Component {
         <Link 
           to="/shoppingcart" 
           data-testid="shopping-cart-button"
-          savecart={ cart }
         >
           <h3>Carrinho</h3>
         </Link>
-
 
         {/* Ficha técnica do produto. */}
         <p data-testid="product-detail-name">{ currentProduct.title }</p>
@@ -74,11 +62,50 @@ class ProductDetail extends Component {
         {/* Botão que adiciona o produto ao carrinho de compras. */}
         <button
           type="button"
-          data-testid="product-add-to-cart"
-          onClick={ this.addProductCart }
+          data-testid="product-detail-add-to-cart"
+          onClick={ () => updatestate({ 
+            data: currentProduct.id,
+            action: "addProductCart" 
+          }) }
         >
           Adicionar ao carrinho
         </button>
+
+        <form>
+          <label htmlFor="product-detail-email">
+            e-mail:
+            <input
+              data-testid="product-detail-email"
+              id="product-detail-email"
+              type="text"
+              name="email"
+              value={ email }
+              onChange={ this.handleChange }
+            />
+          </label>
+          <label htmlFor="product-detail-evaluation">
+            Avaliação:
+            <textarea
+              data-testid="product-detail-evaluation"
+              id="product-detail-evaluation"
+              name="evaluation"
+              value={ evaluation }
+              onChange={ this.handleChange }
+            >
+              Escreva aqui sua avaliação.
+            </textarea>
+          </label>
+          <button
+            data-testid="submit-review-btn"
+            type="button"
+            onClick={ () => updatestate({ 
+              data: currentProduct.id,
+              action: "addProductCart" 
+            }) }
+          >
+            Enviar Avaliação
+          </button>
+        </form>
       </>
     );
   }
