@@ -27,15 +27,6 @@ class App extends Component {
     // }
   };
 
-  componentDidMount() {
-    const recoverEvaluations = localStorage.getItem('evaluations');
-    const evaluations = recoverEvaluations === null ? {} : JSON.parse(recoverEvaluations);
-    const recoverCart = localStorage.getItem('cart');
-    const cart = recoverCart === null ? {} : JSON.parse(recoverCart);
-
-    this.setState({ evaluations, cart });
-  }
-
   updateState = async ({ data, action }) => {
     const { cart } = this.state;
     const unity = 1;
