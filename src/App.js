@@ -1,17 +1,16 @@
-import React, { Component } from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import React, {Component} from 'react';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import Home from './pages/Home';
 import ShoppingCart from './pages/ShoppingCart';
 import ProductDetail from './pages/ProductDetail';
-import { getProductData } from './services/api';
 
 class App extends Component {
   state = {
-    valuations: {},    
+    evaluations: {},
     cart: {},
     clientData: {},
     //
-    // valuations:
+    // evaluations:
     //
     // data ('ID do produto'): {
     //   email: 'email do usuário',
@@ -27,32 +26,28 @@ class App extends Component {
     //   rating: 'nota do produto de 1 a 5 estrelas',
     //   valuation: 'avaliação comentada do produto',
     // }
-  }
+  };
 
   componentDidMount() {
-    const recoverValuations = localStorage.getItem('valuations');
-    const valuations = recoverValuations === null 
-      ? {} 
-      : JSON.parse(recoverValuations);
+    const recoverEvaluations = localStorage.getItem('evaluations');
+    const evaluations =
+      recoverEvaluations === null ? {} : JSON.parse(recoverEvaluations);
     const recoverCart = localStorage.getItem('cart');
-    const cart = recoverCart === null 
-      ? {}
-      : JSON.parse(recoverCart);
+    const cart = recoverCart === null ? {} : JSON.parse(recoverCart);
     const recoverClientData = localStorage.getItem('cart');
-    const clientData = recoverClientData === null 
-      ? {}
-      : JSON.parse(recoverClientData);    
-    
-    this.setState({ valuations, cart, clientData });
+    const clientData =
+      recoverClientData === null ? {} : JSON.parse(recoverClientData);
+
+    this.setState({evaluations, cart, clientData});
   }
 
   updateState = async ({data, action}) => {
-    const { cart } = this.state;
+    const {cart} = this.state;
     const unity = 1;
 
-    switch(action) {
+    switch (action) {
       case 'addProductCart':
-        if(data.id in cart) return;
+        if (data.id in cart) return;
         const product = {
           quantity: unity,
           productData: data,
@@ -61,45 +56,56 @@ class App extends Component {
         };
 
         this.setState(
-          (previousState) => ({ 
+          (previousState) => ({
             cart: {
               ...previousState.cart,
               [data.id]: product,
-            }
+            },
           }),
           () => {
-            const { cart } = this.state;
+            const {cart} = this.state;
             localStorage.setItem('cart', JSON.stringify(cart));
           }
-        ); 
-      break;
+        );
+        break;
       case 'increase':
         cart[data].quantity += unity;
-        this.setState({ cart });
+        this.setState({cart});
         localStorage.setItem('cart', JSON.stringify(cart));
-      break;
+        break;
       case 'decrease':
-        if(cart[data].quantity === unity) return;
-        cart[data].quantity -= unity;        
-        this.setState({ cart });
+        if (cart[data].quantity === unity) return;
+        cart[data].quantity -= unity;
+        this.setState({cart});
         localStorage.setItem('cart', JSON.stringify(cart));
-      break;
+        break;
       case 'remove':
         delete cart[data];
-        this.setState({ cart });
+        this.setState({cart});
         localStorage.setItem('cart', JSON.stringify(cart));
-      break;
+        break;
       case 'addProductEvaluation':
-        console.log('evaluation');
-      break;
+        this.setState(
+          (previousState) => ({
+            evaluations: {
+              ...previousState.evaluations,
+              [data.productID]: data.currentEvaluation,
+            },
+          }),
+          () => {
+            const {evaluations} = this.state;
+            localStorage.setItem('evaluations', JSON.stringify(evaluations));
+          }
+        );
+        break;
       default:
         this.setState({cart: {}});
         localStorage.clear();
     }
-  }
+  };
 
   render() {
-    const { cart } = this.state;
+    const {evaluations, cart} = this.state;
     return (
       <>
         <h1>FrontEnd Online Store</h1>
@@ -107,24 +113,27 @@ class App extends Component {
           <Switch>
             <Route
               exact
-              path="/"
-              render={ (props) => (
-                <Home { ...props } updatestate={ this.updateState } />
-              ) }
+              path='/'
+              render={(props) => (
+                <Home {...props} updatestate={this.updateState} />
+              )}
             />
             <Route
-              path="/shoppingcart"
-              render={ (props) => (
-                <ShoppingCart { ...props } 
-                  updatestate={ this.updateState }
-                  cart={ cart } />
-              ) }
+              path='/shoppingcart'
+              render={(props) => (
+                <ShoppingCart
+                  {...props}
+                  updatestate={this.updateState}
+                  cart={cart}
+                  evaluations={evaluations}
+                />
+              )}
             />
             <Route
-              path="/productdetail/:id"
-              render={ (props) => (
-                <ProductDetail { ...props } updatestate={ this.updateState } />
-              ) }
+              path='/productdetail/:id'
+              render={(props) => (
+                <ProductDetail {...props} updatestate={this.updateState} />
+              )}
             />
           </Switch>
         </BrowserRouter>
