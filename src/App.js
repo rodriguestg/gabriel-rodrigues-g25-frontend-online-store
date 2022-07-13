@@ -32,9 +32,6 @@ class App extends Component {
     const evaluations = recoverEvaluations === null ? {} : JSON.parse(recoverEvaluations);
     const recoverCart = localStorage.getItem('cart');
     const cart = recoverCart === null ? {} : JSON.parse(recoverCart);
-    const recoverClientData = localStorage.getItem('cart');
-    const clientData = recoverClientData === null ? {} : JSON.parse(recoverClientData);
-    console.log(clientData);
 
     this.setState({ evaluations, cart });
   }
