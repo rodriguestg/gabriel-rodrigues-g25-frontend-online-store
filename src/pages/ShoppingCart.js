@@ -1,22 +1,50 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 class ShoppingCart extends Component {
   state = {
-    cart: [],
+    cart: {},
+    minimumQuantity: 1,
   }
 
   // Recupera o carrinho da Local Storage.
-  async componentDidMount() {
-    const previousCart = localStorage.getItem('cart');
-    const recoverCart = previousCart === null ? [] : Object.values(JSON.parse(previousCart));
-    const cart = recoverCart.map((item) => JSON.parse(item));
+  componentDidMount() {
+    const { savecart } = this.props;
+    const cart = savecart === null || savecart === undefined
+    ? {} 
+    : savecart;
     this.setState({ cart });
+  }
+
+  // Atualiza a quantidade de produtos e o carrinho da Local Storage.
+  updateQuantity = ( productID, action) => {
+    const { cart } = this.state;
+    const unit = 1;
+    let copyCart = JSON.parse(JSON.stringify(cart));
+
+    if(action === 'increase') {
+      copyCart[productID].quantity += unit;
+    }
+    if(action === 'decrease') {
+      if(cart[productID].quantity === unit) return;
+      copyCart[productID].quantity -= unit;
+    }
+    if(action === 'remove') {
+      delete copyCart[productID];
+    }
+
+    this.setState({cart: copyCart});
+    localStorage.setItem('cart', JSON.stringify(copyCart));
+  }
+
+  clearCart = () => {
+    this.setState({cart: {}});
+    localStorage.clear();
   }
 
   render() {
     const { cart } = this.state;
+    const { savecart } = this.props;
 
     // Link para a página inicial.
     const buttonHome = (
@@ -36,14 +64,23 @@ class ShoppingCart extends Component {
     );
 
     // Renderiza a tela de carrinho vazio caso não haja produtos.
-    if(cart.length === 0) return cartNull
+    // if(Object.keys(cart).length === 0) return cartNull;
 
     return (
       <>        
         {buttonHome}
         <h4>Carrinho de compras</h4>
-        {cart.map((product) => (
-          <div key={ product.productData.id }>
+        <button
+          type='button'
+          onClick={ this.clearCart }
+        >
+          Limpar carrinho
+        </button>
+
+        {console.log(savecart)}
+        {/* Lista do carrinho de compras. */}
+        {Object.entries(cart).map(([ id, product ]) => (
+          <div key={ id }>
             <p data-testid="shopping-cart-product-name">
               { product.productData.title }
             </p>
@@ -55,6 +92,28 @@ class ShoppingCart extends Component {
             <p data-testid="shopping-cart-product-quantity">
               { product.quantity }
             </p>
+            <span>
+              <button                
+                data-testid="product-increase-quantity"
+                type="button"
+                onClick={ () => this.updateQuantity( id, 'increase') }
+              >
+                + item
+              </button>
+              <button                
+                data-testid="product-decrease-quantity"
+                type="button"
+                onClick={ () => this.updateQuantity( id, 'decrease') }
+              >
+                - item
+              </button>
+              <button
+                type="button"
+                onClick={ () => this.updateQuantity( id, 'remove') }
+              >
+                Remover item
+              </button>
+            </span>
           </div>
         ))}
       </>

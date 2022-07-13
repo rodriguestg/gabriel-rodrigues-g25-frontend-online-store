@@ -13,26 +13,12 @@ class Home extends Component {
     searchTerm: '',
     searchResults: [],
     searchMessage: 'initial',
-    clientData: {},
-    cart: [],
-    // Estrutura da propriedade 'cart':
-    //
-    // {
-    //   productID: 'ID do produto',
-    //   quantity: 'quantidade',
-    //   productData: 'retorno da API sobre o produto',
-    //   rating: 'nota do produto de 1 a 5 estrelas',
-    //   valuation: 'avaliação comentada do produto',
-    // }
   };
 
   // Realiza a requisição das categorias de produtos e recupera o carrinho da Local Storage.
   async componentDidMount() {
-    const categories = await getCategories(); 
-    const previousCart = localStorage.getItem('cart');
-    const recoverCart = previousCart === null ? [] : Object.values(JSON.parse(previousCart));
-    const cart = recoverCart.map((item) => JSON.parse(item));
-    this.setState({ categories, cart });
+    const categories = await getCategories();
+    this.setState({ categories });
   }
 
   // Controla o valor da barra de pesquisa.
@@ -48,33 +34,35 @@ class Home extends Component {
   }
 
   // Adiciona um NOVO item ao carrinho.
-  createProductCart = async (productID) => {
-    const { cart } = this.state;
-    const checkAddProduct = cart.some((product) => product.productID === productID);
-    if(checkAddProduct) return alert('Este produto já está adicionado ao carrinho.');
+  addProductCart = async (productID) => {
+    const unity = 1;
 
-    const productData = await getProductData(productID);
     const product = {
-      productID,
-      quantity: 1,
-      productData,
-      rating: null,
-      valuation: null,
+        quantity: unity,
+        productData: await getProductData(productID),
+        rating: null,
+        valuation: null,
     };
+
+    this.setState({clientData: 12})
     
     // Atualiza o carrinho de compras no estado e na Local Storage.
-    this.setState(
-      (previousState) => ({ cart: [ ...previousState.cart, product] }),
-      () => {
-        const { cart } = this.state;
-        const convertCart = cart.reduce((acc, item, index) => {
-          const content = JSON.stringify(item);
-          acc[`${index}`] = content;
-          return acc;
-        }, {});
-        localStorage.setItem('cart', JSON.stringify(convertCart));
-      }
-    ); 
+    // this.setState(
+    //   (previousState) => ({ 
+    //     cart: {
+    //       ...previousState.cart,
+    //       [productID]: product,
+    //     }
+    //   }),
+    //   () => {
+    //     const { cart } = this.state;
+    //     localStorage.setItem('cart', JSON.stringify(cart));
+    //     console.log(cart)
+    //   }
+    // ); 
+
+    console.log(this.state.clientData)
+    
   }
 
   // Realiza uma busca através de um termo específico.
@@ -104,6 +92,7 @@ class Home extends Component {
       searchTerm, 
       searchResults, 
       searchMessage,
+      cart,
     } = this.state;
 
     // Mensagens para "tela inicial" e "sem resultados de busca".
@@ -113,6 +102,7 @@ class Home extends Component {
       </p>
     );
     const nullResults = <p>Nenhum produto foi encontrado</p>;
+    console.log(this.state.clientData)
 
     return (
       <>
@@ -131,7 +121,11 @@ class Home extends Component {
         ))}
 
         {/* Link para o carrinho de compras. */}
-        <Link to="/shoppingcart" data-testid="shopping-cart-button">
+        <Link 
+          to="/shoppingcart" 
+          data-testid="shopping-cart-button"
+          savecart={ cart }
+        >
           <h3>Carrinho</h3>
         </Link>
 
@@ -186,7 +180,7 @@ class Home extends Component {
               <button                
                 data-testid="product-add-to-cart"
                 type="button"
-                onClick={ () => this.createProductCart(product.id) }
+                onClick={ () => this.addProductCart(product.id) }
               >
                 Adicionar ao carrinho
               </button>
