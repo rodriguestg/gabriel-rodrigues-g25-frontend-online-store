@@ -146,7 +146,7 @@ class Home extends Component {
                 data-testid="product-add-to-cart"
                 type="button"
                 onClick={ () => updatestate({ 
-                  data: product.id,
+                  data: product,
                   action: "addProductCart" 
                 })}
               >

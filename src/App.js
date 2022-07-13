@@ -52,22 +52,19 @@ class App extends Component {
 
     switch(action) {
       case 'addProductCart':
-        if(data in cart) return;
-        const productData = await getProductData(data);
-
+        if(data.id in cart) return;
         const product = {
           quantity: unity,
-          productData,
+          productData: data,
           rating: null,
           valuation: null,
         };
-        // console.log(product.productData.title)
 
         this.setState(
           (previousState) => ({ 
             cart: {
               ...previousState.cart,
-              [data]: product,
+              [data.id]: product,
             }
           }),
           () => {
@@ -91,6 +88,9 @@ class App extends Component {
         delete cart[data];
         this.setState({ cart });
         localStorage.setItem('cart', JSON.stringify(cart));
+      break;
+      case 'addProductEvaluation':
+        console.log('evaluation');
       break;
       default:
         this.setState({cart: {}});

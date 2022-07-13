@@ -6,7 +6,7 @@ import { getProductData } from '../services/api';
 class ProductDetail extends Component {
   state = {
     currentProduct: {},
-    currentValidation: {
+    currentEvaluation: {
       email: '',
       rating: 0,
       evaluation: '',
@@ -24,18 +24,19 @@ class ProductDetail extends Component {
     const newValue = target.value;
 
     this.setState((previousState) => ({
-      currentValidation: { ...previousState.currentValidation, [property]: newValue },
+      currentEvaluation: { ...previousState.currentEvaluation, [property]: newValue },
     }));
   }
 
   render() {
     const { 
       currentProduct,
-      currentValidation: {
+      currentEvaluation: {
         email,
         rating,
         evaluation,
-      }
+      },
+      currentEvaluation,
     } = this.state;
     const { updatestate } = this.props;
 
@@ -47,7 +48,7 @@ class ProductDetail extends Component {
         </Link>
 
         {/* Link para o carrinho de compras. */}
-        <Link 
+        <Link
           to="/shoppingcart" 
           data-testid="shopping-cart-button"
         >
@@ -64,7 +65,7 @@ class ProductDetail extends Component {
           type="button"
           data-testid="product-detail-add-to-cart"
           onClick={ () => updatestate({ 
-            data: currentProduct.id,
+            data: currentProduct,
             action: "addProductCart" 
           }) }
         >
@@ -99,8 +100,8 @@ class ProductDetail extends Component {
             data-testid="submit-review-btn"
             type="button"
             onClick={ () => updatestate({ 
-              data: currentProduct.id,
-              action: "addProductCart" 
+              data: currentEvaluation,
+              action: "addProductEvaluation"
             }) }
           >
             Enviar Avaliação
