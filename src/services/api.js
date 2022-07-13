@@ -16,7 +16,7 @@ export async function getProductsFromCategoryAndQuery({ category, query }) {
 
 // Realiza a importação dos dados de um produto específico.
 export async function getProductData(productID) {
-  const ENDPOINT = `https://api.mercadolibre.com/items/${productID}`
+  const ENDPOINT = `https://api.mercadolibre.com/items/${productID}`;
   const response = await fetch(ENDPOINT);
   const productData = response.json();
   return productData;
