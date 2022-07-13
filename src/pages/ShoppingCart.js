@@ -95,7 +95,7 @@ class ShoppingCart extends Component {
 
 ShoppingCart.propTypes = {
   updatestate: PropTypes.func.isRequired,
-  cart: PropTypes.objectOf().isRequired,
+  cart: PropTypes.objectOf.isRequired,
 };
 
 export default ShoppingCart;
