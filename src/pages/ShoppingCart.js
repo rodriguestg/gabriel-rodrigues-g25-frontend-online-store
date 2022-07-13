@@ -1,76 +1,106 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
+import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 
 class ShoppingCart extends Component {
-  state = {
-    cartEmpty: true,
-    productUpdate: undefined,
-    products: [],
-  }
-
-  async componentDidMount() {
-    const { productUp } = this.props;
-    this.setState({
-      productUpdate: productUp,
-    }, () => {
-      const { productUpdate } = this.state;
-      if (productUpdate) { this.addProduct(); }
-    });
-  }
-
-  addProduct = async () => {
-    const { productUpdate } = this.state;
-    const ENDPOINT = `https://api.mercadolibre.com/items/${productUpdate}`;
-    const response = await fetch(ENDPOINT);
-    const productAdd = await response.json();
-    this.setState(({ products }) => ({
-      cartEmpty: false,
-      products: [...products, productAdd],
-    }));
-  }
-
-  renderCart = () => {
-    const { products } = this.state;
-    return products.map((product) => (
-      <div key={ product.id }>
-        <p data-testid="shopping-cart-product-name">{ product.title }</p>
-        <img alt="" src={ product.thumbnail } />
-        <p>{ product.price }</p>
-        <p data-testid="shopping-cart-product-quantity">1 Produto</p>
-      </div>
-    ));
-  };
-
-  clear = () => {
-    this.setState({
-      productUpdate: undefined,
-    });
-  }
-
   render() {
-    const { cartEmpty } = this.state;
-    const cartInitial = (
-      <div>
-        <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
-      </div>
+    const {updatestate, cart} = this.props;
+
+    // Link para a página inicial.
+    const buttonHome = (
+      <Link to='/'>
+        <h3>Home</h3>
+      </Link>
     );
+
+    // Renderiza a tela de carrinho vazio caso não haja produtos.
+    if (Object.keys(cart).length === 0)
+      return (
+        <>
+          {buttonHome}
+          <div>
+            <p data-testid='shopping-cart-empty-message'>
+              Seu carrinho está vazio
+            </p>
+          </div>
+        </>
+      );
+
     return (
-      <section>
-        { cartEmpty ? cartInitial : this.renderCart() }
-        <Link to="/">
-          <button type="button" onClick={ this.clear }>Voltar</button>
-        </Link>
-      </section>
+      <>
+        {buttonHome}
+        <h4>Carrinho de compras</h4>
+        <button
+          type='button'
+          onClick={() =>
+            updatestate({
+              data: '',
+              action: 'clear',
+            })
+          }
+        >
+          Limpar carrinho
+        </button>
+
+        {/* Lista do carrinho de compras. */}
+        {Object.entries(cart).map(([id, product]) => (
+          <div key={id}>
+            <p data-testid='shopping-cart-product-name'>
+              {product.productData.title}
+            </p>
+            <img alt='product thumbnail' src={product.productData.thumbnail} />
+            <p>Preço: {product.productData.price}</p>
+            <p data-testid='shopping-cart-product-quantity'>
+              {product.quantity}
+            </p>
+            <span>
+              <button
+                data-testid='product-increase-quantity'
+                type='button'
+                onClick={() =>
+                  updatestate({
+                    data: id,
+                    action: 'increase',
+                  })
+                }
+              >
+                + item
+              </button>
+              <button
+                data-testid='product-decrease-quantity'
+                type='button'
+                onClick={() =>
+                  updatestate({
+                    data: id,
+                    action: 'decrease',
+                  })
+                }
+              >
+                - item
+              </button>
+              <button
+                type='button'
+                onClick={() =>
+                  updatestate({
+                    data: id,
+                    action: 'remove',
+                  })
+                }
+              >
+                Remover item
+              </button>
+            </span>
+          </div>
+        ))}
+      </>
     );
   }
 }
 
-export default ShoppingCart;
-
 ShoppingCart.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.objectOf(PropTypes.string),
-  }).isRequired,
-  productUp: PropTypes.string.isRequired,
+  updatestate: PropTypes.func.isRequired,
+  cart: PropTypes.objectOf().isRequired,
+  evaluations: PropTypes.objectOf().isRequired,
 };
+
+export default ShoppingCart;
