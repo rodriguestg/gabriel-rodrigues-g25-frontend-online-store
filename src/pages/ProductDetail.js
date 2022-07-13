@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import starVoid from '../images/starVoid.png';
 import starFull from '../images/starFull.png';
-import {getProductData} from '../services/api';
+import { getProductData } from '../services/api';
 
 class ProductDetail extends Component {
   state = {
@@ -19,21 +19,20 @@ class ProductDetail extends Component {
   async componentDidMount() {
     const {
       match: {
-        params: {id},
+        params: { id },
       },
     } = this.props;
 
     const recoverEvaluations = localStorage.getItem('evaluations');
-    const evaluations =
-      recoverEvaluations === null ? {} : JSON.parse(recoverEvaluations);
+    const evaluations = recoverEvaluations === null ? {} : JSON.parse(recoverEvaluations);
     const listEvaluations = Object.keys(evaluations);
     const currentEvaluation = listEvaluations.includes(id)
       ? {
-          email: evaluations[id].email,
-          rating: evaluations[id].rating,
-          evaluation: evaluations[id].evaluation,
-        }
-      : {email: '', rating: 0, evaluation: ''};
+        email: evaluations[id].email,
+        rating: evaluations[id].rating,
+        evaluation: evaluations[id].evaluation,
+      }
+      : { email: '', rating: 0, evaluation: '' };
 
     this.setState({
       currentProduct: await getProductData(id),
@@ -41,7 +40,7 @@ class ProductDetail extends Component {
     });
   }
 
-  handleChange = ({target}) => {
+  handleChange = ({ target }) => {
     const property = target.name;
     const newValue = target.value;
 
@@ -54,8 +53,8 @@ class ProductDetail extends Component {
   };
 
   handleClick = (currentEvaluation) => {
-    const {updatestate} = this.props;
-    const {currentProduct} = this.state;
+    const { updatestate } = this.props;
+    const { currentProduct } = this.state;
     // this.setState({
     //   currentEvaluation: {
     //     email: '',
@@ -72,7 +71,7 @@ class ProductDetail extends Component {
     });
   };
 
-  handleClickRating = ({target}) => {
+  handleClickRating = ({ target }) => {
     const rating = Number(target.name);
     this.setState((previousState) => ({
       currentEvaluation: {
@@ -85,96 +84,103 @@ class ProductDetail extends Component {
   render() {
     const {
       currentProduct,
-      currentEvaluation: {email, rating, evaluation},
+      currentEvaluation: { email, rating, evaluation },
       currentEvaluation,
     } = this.state;
-    const {updatestate} = this.props;
+    const { updatestate } = this.props;
     const initialRating = ['A', 'B', 'C', 'D', 'E'];
 
     return (
       <>
         {/* Link para a página inicial. */}
-        <Link to='/'>
+        <Link to="/">
           <h3>Home</h3>
         </Link>
 
         {/* Link para o carrinho de compras. */}
-        <Link to='/shoppingcart' data-testid='shopping-cart-button'>
+        <Link to="/shoppingcart" data-testid="shopping-cart-button">
           <h3>Carrinho</h3>
         </Link>
 
         {/* Ficha técnica do produto. */}
-        <p data-testid='product-detail-name'>{currentProduct.title}</p>
-        <img alt='product-detail' src={currentProduct.thumbnail} />
+        <p data-testid="product-detail-name">{currentProduct.title}</p>
+        <img alt="product-detail" src={ currentProduct.thumbnail } />
         <p>{currentProduct.price}</p>
 
         {/* Botão que adiciona o produto ao carrinho de compras. */}
         <button
-          type='button'
-          data-testid='product-detail-add-to-cart'
-          onClick={() =>
-            updatestate({
-              data: currentProduct,
-              action: 'addProductCart',
-            })
-          }
+          type="button"
+          data-testid="product-detail-add-to-cart"
+          onClick={ () => updatestate({
+            data: currentProduct,
+            action: 'addProductCart',
+          }) }
         >
           Adicionar ao carrinho
         </button>
 
         <form>
-          <label htmlFor='product-detail-email'>
+          <label htmlFor="product-detail-email">
             e-mail:
             <input
-              data-testid='product-detail-email'
-              id='product-detail-email'
-              type='text'
-              name='email'
-              value={email}
-              onChange={this.handleChange}
+              data-testid="product-detail-email"
+              id="product-detail-email"
+              type="text"
+              name="email"
+              value={ email }
+              onChange={ this.handleChange }
             />
           </label>
-          <label htmlFor='product-detail-evaluation'>
+          <label htmlFor="product-detail-evaluation">
             Avaliação:
             <textarea
-              data-testid='product-detail-evaluation'
-              id='product-detail-evaluation'
-              name='evaluation'
-              value={evaluation}
-              onChange={this.handleChange}
+              data-testid="product-detail-evaluation"
+              id="product-detail-evaluation"
+              name="evaluation"
+              value={ evaluation }
+              onChange={ this.handleChange }
             >
               Escreva aqui sua avaliação.
             </textarea>
           </label>
           <span>
-            {initialRating.map((item, index) => {
-              return (
-                <span key={`${item + 1 + index}`}>
-                  {index + 1 <= rating ? (
+            {initialRating.map((item, index) => (
+              <span key={ `${item + 1 + index}` }>
+                {index + 1 <= rating ? (
+                  <div
+                    role="button"
+                    tabIndex={ index }
+                    onKeyPress={ this.handleClickRating }
+                    data-testid={ `${index + 1}-rating` }
+                  >
                     <img
-                      data-testid={`${index + 1}-rating`}
-                      name={`${index + 1}`}
-                      alt='star full'
-                      src={starFull}
-                      onClick={this.handleClickRating}
+                      name={ `${index + 1}` }
+                      alt="star full"
+                      src={ starFull }
                     />
-                  ) : (
+                  </div>
+                ) : (
+                  <div
+                    role="button"
+                    tabIndex={ index }
+                    onKeyPress={ this.handleClickRating }
+                    data-testid={ `${index + 1}-rating` }
+                    onClick={ this.handleClickRating }
+                  >
                     <img
-                      data-testid={`${index + 1}-rating`}
-                      name={`${index + 1}`}
-                      alt='star void'
-                      src={starVoid}
-                      onClick={this.handleClickRating}
+                      name={ `${index + 1}` }
+                      alt="star void"
+                      src={ starVoid }
                     />
-                  )}
-                </span>
-              );
-            })}
+                  </div>
+                )}
+              </span>
+            ))}
           </span>
           <button
-            data-testid='submit-review-btn'
-            type='button'
-            onClick={() => this.handleClick(currentEvaluation)}
+            data-testid="submit-review-btn"
+            type="button"
+            onClick={ () => this.handleClick(currentEvaluation) }
           >
             Enviar Avaliação
           </button>
